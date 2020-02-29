@@ -177,6 +177,8 @@ public class DNSLookupService {
 
         // TODO To be completed by the student
 
+        retrieveResultsFromServer(node, rootServer);
+
         return cache.getCachedResults(node);
     }
 
@@ -191,6 +193,14 @@ public class DNSLookupService {
     private static void retrieveResultsFromServer(DNSNode node, InetAddress server) {
 
         // TODO To be completed by the student
+        // TODO: change ID to random number
+        DNSQuery query = new DNSQuery(node, 10);
+        try {
+            query.sendPacket(socket, rootServer);
+        } catch (Exception e) {
+
+        }
+
     }
 
     private static void verbosePrintResourceRecord(ResourceRecord record, int rtype) {

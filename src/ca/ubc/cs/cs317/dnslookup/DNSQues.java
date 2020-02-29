@@ -21,7 +21,7 @@ public class DNSQues {
     public void serialize(DataOutputStream dataOutputStream) throws Exception {
 
         // write the domain name as labels
-        String[] labels = NAME.split(".");
+        String[] labels = NAME.split("\\.");
         for(String label: labels) {
 
             dataOutputStream.writeByte(label.length());

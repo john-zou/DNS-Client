@@ -14,7 +14,7 @@ public class DNSQuery {
     public DNSQues dnsQuestion;
 
     public DNSQuery(DNSNode node, int queryID){
-
+        // fixed values for this assignment
         dnsHeader = new DNSHeader(queryID, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0);
 
         dnsQuestion = new DNSQues(node.getHostName(), node.getType().getCode());
