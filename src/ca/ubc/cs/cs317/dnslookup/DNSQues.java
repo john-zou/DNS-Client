@@ -3,15 +3,15 @@ package ca.ubc.cs.cs317.dnslookup;
 import java.io.DataOutputStream;
 
 // DNS Question for both query and response
-public class DNSQ {
+public class DNSQues {
     public String NAME;
     public int TYPE;
     public int CLASS = 1;
 
-    public DNSQ(){
+    public DNSQues(){
     }
 
-    public DNSQ(String NAME, int TYPE) {
+    public DNSQues(String NAME, int TYPE) {
 
         this.NAME = NAME;
         this.TYPE = TYPE;
