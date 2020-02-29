@@ -197,6 +197,9 @@ public class DNSLookupService {
         DNSQuery query = new DNSQuery(node, 10);
         try {
             query.sendPacket(socket, rootServer);
+
+            DNSResponse response = DNSResponse.receiveDNS(socket);
+            response.print();
         } catch (Exception e) {
 
         }
