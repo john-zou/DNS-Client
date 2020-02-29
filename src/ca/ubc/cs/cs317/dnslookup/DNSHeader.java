@@ -3,7 +3,7 @@ package ca.ubc.cs.cs317.dnslookup;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 
-// Generic DNS Header for both Question and Answer
+// Generic DNS Header for both query and response
 
 public class DNSHeader {
 
