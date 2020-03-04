@@ -16,7 +16,8 @@ public class DNSLookupService {
     private static InetAddress rootServer;
     private static boolean verboseTracing = false;
     private static DatagramSocket socket;
-    private static int previousQueryID;
+    private static boolean querySuccess = true;
+    private static int previousQueryID = -1;
 
     private static DNSCache cache = DNSCache.getInstance();
 
@@ -200,7 +201,12 @@ public class DNSLookupService {
     private static void retrieveResultsFromServer(DNSNode node, InetAddress server) {
         // TODO To be completed by the student
         // TODO: change ID to random number
-        DNSQuery query = new DNSQuery(node, 10);
+        DNSQuery query;
+        if (querySuccess) {
+            query = new DNSQuery(node, random.nextInt(65536));
+        } else {
+            query = new DNSQuery(node, previousQueryID);
+        }
         DNSResponse response;
         try {
             if (verboseTracing) {
@@ -211,9 +217,12 @@ public class DNSLookupService {
             if (verboseTracing) {
                 response.print();
             }
+            querySuccess = true;
+            previousQueryID = query.queryID;
         } catch (SocketTimeoutException e) {
-            if (query.queryID != previousQueryID) {
+            if (querySuccess) {
                 previousQueryID = query.queryID;
+                querySuccess = false;
                 retrieveResultsFromServer(node, server);
             }
         } catch (Exception e) {
