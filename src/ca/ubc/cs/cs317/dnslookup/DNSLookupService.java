@@ -196,8 +196,8 @@ public class DNSLookupService {
         // TODO: change ID to random number
         DNSQuery query = new DNSQuery(node, 10);
         try {
+            query.print(server);
             query.sendPacket(socket, rootServer);
-
             DNSResponse response = DNSResponse.receiveDNS(socket);
             response.print();
         } catch (Exception e) {
