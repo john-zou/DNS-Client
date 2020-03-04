@@ -4,24 +4,25 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.net.*;
 
-
 // DNSQuery combines DNSHeader and DNSQues to create a query
 public class DNSQuery {
 
     private static final int DEFAULT_DNS_PORT = 53;
+    public final int queryID;
 
     public DNSHeader dnsHeader;
     public DNSQues dnsQuestion;
 
-    public DNSQuery(DNSNode node, int queryID){
+    public DNSQuery(DNSNode node, int queryID) {
         // fixed values for this assignment
+        this.queryID = queryID;
         dnsHeader = new DNSHeader(queryID, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0);
 
         dnsQuestion = new DNSQues(node.getHostName(), node.getType().getCode());
     }
 
     // combine DNSHeader and DNSQues to a bytes array of query
-    public byte[] toBytes() throws Exception{
+    public byte[] toBytes() throws Exception {
 
         ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
         DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOS);
