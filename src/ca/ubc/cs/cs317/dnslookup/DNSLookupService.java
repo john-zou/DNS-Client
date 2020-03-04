@@ -282,7 +282,7 @@ public class DNSLookupService {
             if (verboseTracing) {
                 query.print(server);
             }
-            query.sendPacket(socket, rootServer);
+            query.sendPacket(socket, server);
             response = DNSResponse.receiveDNS(socket);
 
             if (verboseTracing) {

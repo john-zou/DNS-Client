@@ -52,7 +52,7 @@ public class DNSResponse {
             } else if (rt == RecordType.AAAA) {
                 resourceRecord = new ResourceRecord(dnsResponseQues.NAME, rt,
                         TTL, Inet6Address.getByAddress(dnsResponseQues.NAME, RDATA));
-            } else if (rt == RecordType.CNAME) {
+            } else {
 
                 ByteArrayInputStream newByteArrayInputStream = new ByteArrayInputStream(RDATA, 0, RDLENGTH);
                 DataInputStream newDataInputStream = new DataInputStream(newByteArrayInputStream);
@@ -64,10 +64,10 @@ public class DNSResponse {
                         TTL, hostName.substring(0, hostName.length() - 1));
             }
             // If NS then we don't need any text
-            else {
-                resourceRecord = new ResourceRecord(dnsResponseQues.NAME, RecordType.getByCode(dnsResponseQues.TYPE),
-                        TTL, "xxx");
-            }
+//            else if (rt == RecordType.NS) {
+//                resourceRecord = new ResourceRecord(dnsResponseQues.NAME, RecordType.getByCode(dnsResponseQues.TYPE),
+//                        TTL, "xxx");
+//            }
 
             // add records to the correct set
             if (i < dnsHeader.ANCOUNT) {
