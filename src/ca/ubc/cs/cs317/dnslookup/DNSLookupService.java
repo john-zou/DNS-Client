@@ -203,6 +203,9 @@ public class DNSLookupService {
         DNSQuery query = new DNSQuery(node, 10);
         DNSResponse response;
         try {
+            if (verboseTracing) {
+                query.print(server);
+            }
             query.sendPacket(socket, rootServer);
             response = DNSResponse.receiveDNS(socket);
             if (verboseTracing) {
