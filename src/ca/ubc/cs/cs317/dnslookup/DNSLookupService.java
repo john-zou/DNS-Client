@@ -13,11 +13,13 @@ public class DNSLookupService {
     private static final int DEFAULT_DNS_PORT = 53;
     private static final int MAX_INDIRECTION_LEVEL = 10;
 
+    private static int currIndirectionLevel = 0;
     private static InetAddress rootServer;
     private static boolean verboseTracing = false;
     private static DatagramSocket socket;
     private static boolean querySuccess = true;
     private static int previousQueryID = -1;
+    private static RecordType currOriginalQueryType;
 
     private static DNSCache cache = DNSCache.getInstance();
 
@@ -159,6 +161,7 @@ public class DNSLookupService {
     private static void findAndPrintResults(String hostName, RecordType type) {
 
         DNSNode node = new DNSNode(hostName, type);
+        currOriginalQueryType = type;
         printResults(node, getResults(node, 0));
     }
 
@@ -177,7 +180,7 @@ public class DNSLookupService {
      *         requested.
      */
     private static Set<ResourceRecord> getResults(DNSNode node, int indirectionLevel) {
-
+        currOriginalQueryType = node.getType();
         if (indirectionLevel > MAX_INDIRECTION_LEVEL) {
             System.err.println("Maximum number of indirection levels reached.");
             return Collections.emptySet();
@@ -186,25 +189,74 @@ public class DNSLookupService {
         // TODO To be completed by the student
         if (cache.getCachedResults(node).isEmpty()) {
             retrieveResultsFromServer(node, rootServer);
+            // if retrieve got A or AAAA, do nothing
+            if (!cache.getCachedResults(node).isEmpty()) {
+                // do nothing
+            } else {
+                // check for CNAME
+                DNSNode cNameNode = new DNSNode(node.getHostName(), RecordType.CNAME);
+                List<ResourceRecord> cNameResults = new ArrayList<ResourceRecord>(cache.getCachedResults(cNameNode));
+                if (!cNameResults.isEmpty()) {
+                    ResourceRecord cNameResult = cNameResults.get(0);
+                    // got a CNAME for the node
+                    DNSNode newNode = new DNSNode(cNameResult.getTextResult(), currOriginalQueryType);
+                    return getResults(newNode, indirectionLevel + 1);
+                }
+
+            }
+
         }
 
         return cache.getCachedResults(node);
     }
 
-    private static void processResponse(DNSResponse response) {
+    // check cache and additionals for an IP for the name server
+    private static InetAddress findNameServerAddress(String nsName) {
+        // check the cache
+        DNSNode ipv4Node = new DNSNode(nsName, RecordType.A);
+        List<ResourceRecord> matches = new ArrayList<ResourceRecord>(cache.getCachedResults(ipv4Node));
+        if (!matches.isEmpty()) {
+            return matches.get(0).getInetResult();
+        } else {
+            return null;
+        }
+    }
+
+    private static void processResponse(DNSResponse response, DNSNode node) {
+        response.addToCache(cache);
         // check size of answers
         if (!response.answers.isEmpty()) {
             // Check the first element of answers
-            ArrayList<ResourceRecord> answersArr = new ArrayList<ResourceRecord>(response.answers);
+            List<ResourceRecord> answersArr = new ArrayList<ResourceRecord>(response.answers);
             ResourceRecord rec = answersArr.get(0);
             RecordType currType = rec.getType();
             if (currType == RecordType.A || currType == RecordType.AAAA) {
-                response.addToCache(cache);
+                return;
             } else if (currType == RecordType.CNAME) {
-                DNSNode node = new DNSNode(rec.getTextResult(), new RecordType(response.dnsQuestion.TYPE));
             }
         } else {
-            // TODO
+            // nothing in answers
+            // check nameServers
+            List<ResourceRecord> nsArr = new ArrayList<ResourceRecord>(response.nameServers);
+
+            // for each one in nsArr, check cache (since additional is already in cache)
+            // find the first nameServer that has an IP
+            boolean foundNSAddress = false;
+            for (ResourceRecord rec : nsArr) {
+                String nsName = rec.getTextResult();
+                InetAddress inetAddress = findNameServerAddress(nsName);
+                if (inetAddress == null) {
+                    continue;
+                } else {
+                    foundNSAddress = true;
+                    // found
+                    retrieveResultsFromServer(node, inetAddress);
+                    break;
+                }
+            }
+            if (!foundNSAddress) {
+                // ??
+            }
         }
     }
 
@@ -238,7 +290,7 @@ public class DNSLookupService {
             }
             querySuccess = true;
             previousQueryID = query.queryID;
-            processResponse(response);
+            processResponse(response, node);
 
         } catch (SocketTimeoutException e) {
             if (querySuccess) {
