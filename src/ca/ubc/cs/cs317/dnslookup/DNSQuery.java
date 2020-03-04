@@ -40,12 +40,4 @@ public class DNSQuery {
         socket.send(packet);
     }
 
-    public void print(InetAddress server) {
-
-        System.out.println();
-        System.out.println();
-        System.out.println("Query ID     " + dnsHeader.ID + " " + dnsQuestion.NAME + "  " +
-                RecordType.getByCode(dnsQuestion.TYPE) + " --> " + server.getHostAddress());
-    }
-
 }
