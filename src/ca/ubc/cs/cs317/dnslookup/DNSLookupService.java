@@ -232,7 +232,6 @@ public class DNSLookupService {
             RecordType currType = rec.getType();
             if (currType == RecordType.A || currType == RecordType.AAAA) {
                 return;
-            } else if (currType == RecordType.CNAME) {
             }
         } else {
             // nothing in answers

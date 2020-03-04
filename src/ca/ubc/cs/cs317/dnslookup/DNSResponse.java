@@ -44,15 +44,14 @@ public class DNSResponse {
             // Generate the resource record to be stored
             ResourceRecord resourceRecord;
 
-
             RecordType rt = RecordType.getByCode(dnsResponseQues.TYPE);
             if (rt == RecordType.A) {
-                resourceRecord = new ResourceRecord(dnsResponseQues.NAME, rt,
-                        TTL, Inet4Address.getByAddress(dnsResponseQues.NAME, RDATA));
+                resourceRecord = new ResourceRecord(dnsResponseQues.NAME, rt, TTL,
+                        Inet4Address.getByAddress(dnsResponseQues.NAME, RDATA));
             } else if (rt == RecordType.AAAA) {
-                resourceRecord = new ResourceRecord(dnsResponseQues.NAME, rt,
-                        TTL, Inet6Address.getByAddress(dnsResponseQues.NAME, RDATA));
-            } else {
+                resourceRecord = new ResourceRecord(dnsResponseQues.NAME, rt, TTL,
+                        Inet6Address.getByAddress(dnsResponseQues.NAME, RDATA));
+            } else if (rt == RecordType.NS || rt == RecordType.CNAME) {
 
                 ByteArrayInputStream newByteArrayInputStream = new ByteArrayInputStream(RDATA, 0, RDLENGTH);
                 DataInputStream newDataInputStream = new DataInputStream(newByteArrayInputStream);
@@ -62,12 +61,10 @@ public class DNSResponse {
 
                 resourceRecord = new ResourceRecord(dnsResponseQues.NAME, RecordType.getByCode(dnsResponseQues.TYPE),
                         TTL, hostName.substring(0, hostName.length() - 1));
+            } else {
+                resourceRecord = new ResourceRecord(dnsResponseQues.NAME, RecordType.getByCode(dnsResponseQues.TYPE),
+                        TTL, "xxx");
             }
-            // If NS then we don't need any text
-//            else if (rt == RecordType.NS) {
-//                resourceRecord = new ResourceRecord(dnsResponseQues.NAME, RecordType.getByCode(dnsResponseQues.TYPE),
-//                        TTL, "xxx");
-//            }
 
             // add records to the correct set
             if (i < dnsHeader.ANCOUNT) {
@@ -78,7 +75,6 @@ public class DNSResponse {
                 additional.add(resourceRecord);
             }
         }
-
 
     }
 
@@ -134,9 +130,8 @@ public class DNSResponse {
 
     private void PrintResourceRecord(ResourceRecord record, int rtype) {
 
-        System.out.format("       %-30s %-10d %-4s %s\n", record.getHostName(),
-                record.getTTL(), record.getType(), record.getTextResult());
+        System.out.format("       %-30s %-10d %-4s %s\n", record.getHostName(), record.getTTL(), record.getType(),
+                record.getTextResult());
     }
 
 }
-
