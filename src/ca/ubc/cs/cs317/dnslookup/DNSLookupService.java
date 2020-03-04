@@ -242,6 +242,10 @@ public class DNSLookupService {
             // for each one in nsArr, check cache (since additional is already in cache)
             // find the first nameServer that has an IP
             boolean foundNSAddress = false;
+            if (nsArr.isEmpty()) {
+                // done
+                return;
+            }
             for (ResourceRecord rec : nsArr) {
                 String nsName = rec.getTextResult();
                 InetAddress inetAddress = findNameServerAddress(nsName);
@@ -255,7 +259,22 @@ public class DNSLookupService {
                 }
             }
             if (!foundNSAddress) {
-                // ??
+                // Search rootServer for first NSAddress
+                ResourceRecord firstNSRec = nsArr.get(0);
+                String nsName = firstNSRec.getTextResult();
+                DNSNode nsResolveNode = new DNSNode(nsName, RecordType.A);
+                // Query root DNS server for the NS
+                retrieveResultsFromServer(nsResolveNode, rootServer);
+                // See if result exists in the cache
+                InetAddress inetAddress = findNameServerAddress(nsName);
+                if (inetAddress == null) {
+                    return;
+                } else {
+                    foundNSAddress = true;
+                    // found
+                    retrieveResultsFromServer(node, inetAddress);
+                    return;
+                }
             }
         }
     }

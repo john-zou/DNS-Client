@@ -4,10 +4,12 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.Date;
 
-/** A resource record corresponds to each individual result returned by a DNS response. It links
- * a DNS node (host name and record type) to either an IP address (e.g., A or AAAA records) or
- * a textual response (e.g., CNAME or NS records). A TTL (time-to-live) field is also specified,
- * and is represented by an expiration time calculated as a delta from the current time.
+/**
+ * A resource record corresponds to each individual result returned by a DNS
+ * response. It links a DNS node (host name and record type) to either an IP
+ * address (e.g., A or AAAA records) or a textual response (e.g., CNAME or NS
+ * records). A TTL (time-to-live) field is also specified, and is represented by
+ * an expiration time calculated as a delta from the current time.
  */
 public class ResourceRecord implements Serializable {
 
@@ -40,10 +42,11 @@ public class ResourceRecord implements Serializable {
         return node.getType();
     }
 
-    /** The TTL for this record. It is returned based on the (ceiling of the) number of seconds
-     * remaining until this record expires. The TTL returned by this method will only match the
-     * TTL obtained from the DNS server in the first second from the time this record was
-     * created.
+    /**
+     * The TTL for this record. It is returned based on the (ceiling of the) number
+     * of seconds remaining until this record expires. The TTL returned by this
+     * method will only match the TTL obtained from the DNS server in the first
+     * second from the time this record was created.
      *
      * @return The number of seconds, rounded up, until this record expires.
      */
@@ -51,9 +54,10 @@ public class ResourceRecord implements Serializable {
         return (expirationTime.getTime() - System.currentTimeMillis() + 999) / 1000;
     }
 
-    /** Returns true if this record has not expired yet, and false otherwise. An expired record
-     * should not be maintained in cache, and should instead be retrieved again from an
-     * authoritative DNS server.
+    /**
+     * Returns true if this record has not expired yet, and false otherwise. An
+     * expired record should not be maintained in cache, and should instead be
+     * retrieved again from an authoritative DNS server.
      *
      * @return true if this record has not expired yet, and false otherwise.
      */
@@ -61,13 +65,16 @@ public class ResourceRecord implements Serializable {
         return expirationTime.after(new Date());
     }
 
-    /** Returns true if this record expires before another record. This method may be used to
-     * identify if a newly acquired record should replace the one currently in the cache. It
-     * may also potentially be used, for example, to identify if a CNAME record expires before
-     * the equivalent A record it links to.
+    /**
+     * Returns true if this record expires before another record. This method may be
+     * used to identify if a newly acquired record should replace the one currently
+     * in the cache. It may also potentially be used, for example, to identify if a
+     * CNAME record expires before the equivalent A record it links to.
      *
-     * @param record Another resource record whose expiration this record should be compared with.
-     * @return true if this record expires before the parameter record, or false otherwise.
+     * @param record Another resource record whose expiration this record should be
+     *               compared with.
+     * @return true if this record expires before the parameter record, or false
+     *         otherwise.
      */
     public boolean expiresBefore(ResourceRecord record) {
         return this.expirationTime.before(record.expirationTime);
@@ -83,13 +90,17 @@ public class ResourceRecord implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
 
         ResourceRecord record = (ResourceRecord) o;
 
-        if (!node.equals(record.node)) return false;
-        if (!textResult.equals(record.textResult)) return false;
+        if (!node.equals(record.node))
+            return false;
+        if (!textResult.equals(record.textResult))
+            return false;
         return inetResult != null ? inetResult.equals(record.inetResult) : record.inetResult == null;
     }
 
