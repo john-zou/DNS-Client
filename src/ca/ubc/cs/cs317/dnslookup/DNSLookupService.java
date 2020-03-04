@@ -196,11 +196,12 @@ public class DNSLookupService {
         if (!response.answers.isEmpty()) {
             // Check the first element of answers
             ArrayList<ResourceRecord> answersArr = new ArrayList<ResourceRecord>(response.answers);
-            RecordType currType = answersArr.get(0).getType();
+            ResourceRecord rec = answersArr.get(0);
+            RecordType currType = rec.getType();
             if (currType == RecordType.A || currType == RecordType.AAAA) {
                 response.addToCache(cache);
             } else if (currType == RecordType.CNAME) {
-                // TODO
+                DNSNode node = new DNSNode(rec.getTextResult(), new RecordType(response.dnsQuestion.TYPE));
             }
         } else {
             // TODO
@@ -231,10 +232,6 @@ public class DNSLookupService {
             }
             query.sendPacket(socket, rootServer);
             response = DNSResponse.receiveDNS(socket);
-
-
-
-
 
             if (verboseTracing) {
                 response.print();
