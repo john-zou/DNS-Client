@@ -105,6 +105,10 @@ public class DNSResponse {
             cache.addResult(record);
         }
 
+        for (ResourceRecord record : nameServers) {
+            cache.addResult(record);
+        }
+
         for (ResourceRecord record : additional) {
             cache.addResult(record);
         }

@@ -184,10 +184,27 @@ public class DNSLookupService {
         }
 
         // TODO To be completed by the student
-
-        retrieveResultsFromServer(node, rootServer);
+        if (cache.getCachedResults(node).isEmpty()) {
+            retrieveResultsFromServer(node, rootServer);
+        }
 
         return cache.getCachedResults(node);
+    }
+
+    private static void processResponse(DNSResponse response) {
+        // check size of answers
+        if (!response.answers.isEmpty()) {
+            // Check the first element of answers
+            ArrayList<ResourceRecord> answersArr = new ArrayList<ResourceRecord>(response.answers);
+            RecordType currType = answersArr.get(0).getType();
+            if (currType == RecordType.A || currType == RecordType.AAAA) {
+                response.addToCache(cache);
+            } else if (currType == RecordType.CNAME) {
+                // TODO
+            }
+        } else {
+            // TODO
+        }
     }
 
     /**
@@ -214,11 +231,18 @@ public class DNSLookupService {
             }
             query.sendPacket(socket, rootServer);
             response = DNSResponse.receiveDNS(socket);
+
+
+
+
+
             if (verboseTracing) {
                 response.print();
             }
             querySuccess = true;
             previousQueryID = query.queryID;
+            processResponse(response);
+
         } catch (SocketTimeoutException e) {
             if (querySuccess) {
                 previousQueryID = query.queryID;
