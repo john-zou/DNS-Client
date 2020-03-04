@@ -224,6 +224,8 @@ public class DNSLookupService {
                 previousQueryID = query.queryID;
                 querySuccess = false;
                 retrieveResultsFromServer(node, server);
+            } else {
+                querySuccess = true;
             }
         } catch (Exception e) {
 
