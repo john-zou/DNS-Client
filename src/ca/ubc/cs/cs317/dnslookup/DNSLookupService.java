@@ -236,11 +236,20 @@ public class DNSLookupService {
         } else {
             // nothing in answers
             // check nameServers
-            List<ResourceRecord> nsArr = new ArrayList<ResourceRecord>(response.nameServers);
+            List<ResourceRecord> nsArrAll = new ArrayList<ResourceRecord>(response.nameServers);
 
             // for each one in nsArr, check cache (since additional is already in cache)
             // find the first nameServer that has an IP
             boolean foundNSAddress = false;
+
+            // just NS
+            List<ResourceRecord> nsArr = new ArrayList<ResourceRecord>();
+            for (ResourceRecord rec: nsArrAll) {
+                if (rec.getType() == RecordType.NS) {
+                    nsArr.add(rec);
+                }
+            }
+
             if (nsArr.isEmpty()) {
                 // done
                 return;

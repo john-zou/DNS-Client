@@ -63,7 +63,7 @@ public class DNSResponse {
                         TTL, hostName.substring(0, hostName.length() - 1));
             } else {
                 resourceRecord = new ResourceRecord(dnsResponseQues.NAME, RecordType.getByCode(dnsResponseQues.TYPE),
-                        TTL, "xxx");
+                        TTL, "----");
             }
 
             // add records to the correct set
