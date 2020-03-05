@@ -186,7 +186,6 @@ public class DNSLookupService {
             return Collections.emptySet();
         }
 
-        // TODO To be completed by the student
         if (cache.getCachedResults(node).isEmpty()) {
             retrieveResultsFromServer(node, rootServer);
             // if retrieve got A or AAAA, do nothing
@@ -202,17 +201,14 @@ public class DNSLookupService {
                     DNSNode newNode = new DNSNode(cNameResult.getTextResult(), currOriginalQueryType);
                     return getResults(newNode, indirectionLevel + 1);
                 }
-
             }
-
         }
-
         return cache.getCachedResults(node);
     }
 
     // check cache and additionals for an IP for the name server
     private static InetAddress findNameServerAddress(String nsName) {
-        // check the cache
+        // check the cache (the additionals are already added to the cache)
         DNSNode ipv4Node = new DNSNode(nsName, RecordType.A);
         List<ResourceRecord> matches = new ArrayList<ResourceRecord>(cache.getCachedResults(ipv4Node));
         if (!matches.isEmpty()) {
@@ -223,16 +219,9 @@ public class DNSLookupService {
     }
 
     private static void processResponse(DNSResponse response, DNSNode node) {
-        response.addToCache(cache);
         // check size of answers
         if (!response.answers.isEmpty()) {
-            // Check the first element of answers
-            List<ResourceRecord> answersArr = new ArrayList<ResourceRecord>(response.answers);
-            ResourceRecord rec = answersArr.get(0);
-            RecordType currType = rec.getType();
-            if (currType == RecordType.A || currType == RecordType.AAAA) {
-                return;
-            }
+            // Then the answers are already in the cache and will be taken care of
         } else {
             // nothing in answers
             // check nameServers
@@ -244,7 +233,7 @@ public class DNSLookupService {
 
             // just NS
             List<ResourceRecord> nsArr = new ArrayList<ResourceRecord>();
-            for (ResourceRecord rec: nsArrAll) {
+            for (ResourceRecord rec : nsArrAll) {
                 if (rec.getType() == RecordType.NS) {
                     nsArr.add(rec);
                 }
@@ -296,8 +285,6 @@ public class DNSLookupService {
      * @param server Address of the server to be used for the query.
      */
     private static void retrieveResultsFromServer(DNSNode node, InetAddress server) {
-        // TODO To be completed by the student
-        // TODO: change ID to random number
         DNSQuery query;
         if (querySuccess) {
             query = new DNSQuery(node, random.nextInt(65536));
@@ -312,11 +299,17 @@ public class DNSLookupService {
             query.sendPacket(socket, server);
             response = DNSResponse.receiveDNS(socket);
 
+            querySuccess = true;
+            previousQueryID = query.queryID;
+            response.addToCache(cache);
+            if (response.dnsHeader.RCODE == 3 || response.dnsHeader.RCODE == 5) {
+                // do not print, and do not process
+                return;
+            }
+
             if (verboseTracing) {
                 response.print();
             }
-            querySuccess = true;
-            previousQueryID = query.queryID;
             processResponse(response, node);
 
         } catch (SocketTimeoutException e) {
