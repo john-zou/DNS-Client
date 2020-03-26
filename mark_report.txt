@@ -1,12 +1,12 @@
-Total before late penalty: [/63]
+Total before late penalty: [65/63]
 
 NOTE: in the marking report something left blank (e.g.  [ /6]) typically means
 that you received full marks for that item.  There will be a mark deduction of 10 points if, 
 for any reason, your program fails to compile on the undergraduate machines.
 
-Partner Bonus [/2]
+Partner Bonus [2/2]
 
-General Functionality: [/40]
+General Functionality: [40/40]
 
    [/2] Basic query to a name server that is authoritative.
 
@@ -60,7 +60,7 @@ General Functionality: [/40]
 
         records.
 
-Error Handling: [/8]
+Error Handling: [8/8]
 
    [/2] Timeout - nameserver doesn't respond
 
@@ -70,7 +70,7 @@ Error Handling: [/8]
 
    [/2] Other types of errors (e.g. just do a lookup of  .ca)
 
-Tracing: [/9]
+Tracing: [9/9]
 
   [/1] Prints query ID, server being queried and FQDN
 
@@ -97,7 +97,7 @@ Tracing: [/9]
 
   [/1] Prints type number if not in above
 
-Broad Marking Criteria :                     [/6] 
+Broad Marking Criteria :                     [6/6] 
 
      Readability and quality     [/3]
 
